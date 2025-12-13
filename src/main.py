@@ -22,6 +22,7 @@ auth_manager = AuthManager(Path(__file__).parent / "users.json")
 playlist_manager = PlaylistManager(Path(__file__).parent / "playlists.json")
 
 # Create the dependency functions from auth_manager instance
+# to be used in route definitions below.
 get_current_active_user = auth_manager.get_current_active_user_dependency()
 get_artist_or_admin = auth_manager.get_artist_or_admin_dependency()
 get_admin = auth_manager.get_admin_dependency()
