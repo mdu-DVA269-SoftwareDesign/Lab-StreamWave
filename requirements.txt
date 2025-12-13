@@ -1,0 +1,11 @@
+sqlite-vec
+fastapi
+uvicorn[standard]
+pydantic
+pyjwt
+pwdlib[argon2]
+python-multipart
+pytest
+httpx
+requests
+rich
