@@ -1,22 +1,17 @@
 from typing import List
-from MediaContent import MediaContent
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from Song import Song
+from pydantic import BaseModel, Field
 
 
-class Playlist:
-    def __init__(self):
-        self._ID: int = None
-        self._name: str = None
-        self._songs: List[MediaContent] = None
+class Playlist(BaseModel):
+    ID: int | None = Field(default=None, description="The playlist ID")
+    name: str = Field(..., description="The name of the playlist")
+    song_ids: List[int] = Field(default_factory=list, description="List of song IDs in the playlist")
+    owner_id: int = Field(..., description="The ID of the user who owns this playlist")
 
-    def add_song(self, song: 'Song'):
-        pass
+    def add_song(self, song_id: int) -> None:
+        if song_id not in self.song_ids:
+            self.song_ids.append(song_id)
 
-    def remove_song(self, song: 'Song'):
-        pass
-
-    def get_songs(self) -> List[MediaContent]:
-        return None
+    def remove_song(self, song_id: int) -> None:
+        if song_id in self.song_ids:
+            self.song_ids.remove(song_id)
