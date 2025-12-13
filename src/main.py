@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends, FastAPI
 from fastapi.security import OAuth2PasswordRequestForm
+from Media.MediaManager import get_all_media, search_media
 
 from AuthManager import (
     Token,
@@ -41,8 +42,13 @@ async def read_users_me(
 async def read_own_items(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
-    return [{"item_id": "Foo", "owner": current_user.username}]
+    media_items = get_all_media()
+    return {"user": current_user, "media_items": media_items}
 
+@app.get("/media/search/{query}")
+async def search_media_endpoint(query: str):
+    results = search_media(query)
+    return {"results": results}
 
 @app.get("/")
 async def root():
