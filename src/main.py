@@ -78,6 +78,15 @@ async def read_playlist_by_id(
         raise HTTPException(status_code=403, detail="Not your playlist")
     return playlist
 
+
+@app.get("/media/{media_id}")
+async def get_media_stream_url(media_id: int):
+    media = media_manager.get_by_id(media_id)
+    if not media:
+        raise HTTPException(status_code=404, detail="Media not found")
+    return {"id": media_id, "title": media.get("title"), "url": media.get("url")}
+
+
 @app.get("/media/search/{query}")
 async def search_media_endpoint(query: str):
     results = media_manager.search_media(query)
