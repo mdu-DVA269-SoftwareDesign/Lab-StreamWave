@@ -6,16 +6,16 @@ from Media.MediaManager import MediaManager
 from Media.Song import Song
 from Media.Podcast import Podcast
 
-from Auth.AuthManager import (
-    Token,
-    authenticate_user_login,
-    get_current_active_user,
-    get_artist_or_admin,
-)
+from Auth.AuthManager import AuthManager, Token
 from Auth.User import User
 
 app = FastAPI(title="StreamWave", description="Simple audio streaming application", version="0.0.1-prealpha")
 media_manager = MediaManager()
+auth_manager = AuthManager()
+
+# Create the dependency functions from auth_manager instance
+get_current_active_user = auth_manager.get_current_active_user_dependency()
+get_artist_or_admin = auth_manager.get_artist_or_admin_dependency()
 
 """
 The following code is based on the FastAPI Security Tutorial:
@@ -32,7 +32,7 @@ Repository: https://github.com/tiangolo/fastapi
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
-    return authenticate_user_login(form_data)
+    return auth_manager.authenticate_user_login(form_data)
 
 
 @app.get("/users/me/", response_model=User)
