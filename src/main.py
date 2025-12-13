@@ -65,6 +65,19 @@ async def read_own_playlists(
     playlists = playlist_manager.get_playlists_by_owner(current_user.ID)
     return {"user": current_user, "playlists": playlists}
 
+
+@app.get("/users/me/playlists/{playlist_id}")
+async def read_playlist_by_id(
+    playlist_id: int,
+    current_user: Annotated[User, Depends(get_current_active_user)],
+):
+    playlist = playlist_manager.get_by_id(playlist_id)
+    if not playlist:
+        raise HTTPException(status_code=404, detail="Playlist not found")
+    if playlist.get("owner_id") != current_user.ID:
+        raise HTTPException(status_code=403, detail="Not your playlist")
+    return playlist
+
 @app.get("/media/search/{query}")
 async def search_media_endpoint(query: str):
     results = media_manager.search_media(query)
