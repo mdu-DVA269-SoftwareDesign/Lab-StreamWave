@@ -2,7 +2,7 @@ from typing import Annotated, Union
 
 from fastapi import Depends, FastAPI
 from fastapi.security import OAuth2PasswordRequestForm
-from Media.MediaManager import get_all_media, search_media, add_media_item
+from Media.MediaManager import MediaManager
 from Media.Song import Song
 from Media.Podcast import Podcast
 
@@ -15,6 +15,7 @@ from Auth.AuthManager import (
 from Auth.User import User
 
 app = FastAPI(title="StreamWave", description="Simple audio streaming application", version="0.0.1-prealpha")
+media_manager = MediaManager()
 
 """
 The following code is based on the FastAPI Security Tutorial:
@@ -44,12 +45,12 @@ async def read_users_me(
 async def read_own_items(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
-    media_items = get_all_media()
+    media_items = media_manager.get_all_media()
     return {"user": current_user, "media_items": media_items}
 
 @app.get("/media/search/{query}")
 async def search_media_endpoint(query: str):
-    results = search_media(query)
+    results = media_manager.search_media(query)
     return {"results": results}
 
 @app.post("/media/add_item/")
@@ -57,7 +58,7 @@ async def add_media_item_endpoint(
     item: Union[Song, Podcast],
     current_user: Annotated[User, Depends(get_artist_or_admin)]
 ):
-    add_media_item(item)
+    media_manager.add_media_item(item)
     return {"message": "Media item added successfully", "media_type": item.media_type, "added_by": current_user.username}
 
 @app.get("/")
