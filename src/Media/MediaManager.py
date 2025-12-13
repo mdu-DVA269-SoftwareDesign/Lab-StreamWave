@@ -1,28 +1,16 @@
-import json
 from pathlib import Path
 from typing import List, Optional
 
+from JsonDataManager import JsonDataManager
 from .MediaContent import MediaContent
 from .Podcast import Podcast
 from .Song import Song
 
 
-class MediaManager:
+class MediaManager(JsonDataManager):
     def __init__(self, media_file: Optional[Path] = None):
-        self.media_file = media_file or Path(__file__).parent / "media.json"
-        self._db = self._load()
-
-    def _load(self) -> list[dict]:
-        if not self.media_file.exists():
-            with open(self.media_file, "w") as f:
-                json.dump([], f)
-            return []
-        with open(self.media_file, "r") as f:
-            return json.load(f)
-
-    def _save(self) -> None:
-        with open(self.media_file, "w") as f:
-            json.dump(self._db, f, indent=4)
+        data_file = media_file or Path(__file__).parent / "media.json"
+        super().__init__(data_file, default_data=[])
 
     def add_media_item(self, item: MediaContent) -> None:
         item_dict = item.model_dump(by_alias=True, exclude_none=False)

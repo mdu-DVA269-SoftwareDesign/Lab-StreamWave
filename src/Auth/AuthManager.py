@@ -14,7 +14,6 @@ Repository: https://github.com/tiangolo/fastapi
 
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, Optional
-import json
 from pathlib import Path
 
 import jwt
@@ -24,6 +23,7 @@ from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
 from pydantic import BaseModel
 
+from JsonDataManager import JsonDataManager
 from .RegisteredUser import RegisteredUser
 from .User import User
 from .Artist import Artist
@@ -39,7 +39,7 @@ class TokenData(BaseModel):
     username: str | None = None
 
 
-class AuthManager:
+class AuthManager(JsonDataManager):
     # to get a string like this run:
     # openssl rand -hex 32
     DEFAULT_SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
@@ -53,21 +53,14 @@ class AuthManager:
         algorithm: str = DEFAULT_ALGORITHM,
         access_token_expire_minutes: int = DEFAULT_ACCESS_TOKEN_EXPIRE_MINUTES,
     ):
-        self.users_file = users_file or Path(__file__).parent / "users.json"
+        data_file = users_file or Path(__file__).parent / "users.json"
+        super().__init__(data_file, default_data={})
+        
         self.secret_key = secret_key
         self.algorithm = algorithm
         self.access_token_expire_minutes = access_token_expire_minutes
         self.password_hash = PasswordHash.recommended()
         self.oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-        self._db = self._load()
-    
-    def _load(self) -> dict:
-        with open(self.users_file, "r") as f:
-            return json.load(f)
-    
-    def _save(self) -> None:
-        with open(self.users_file, "w") as f:
-            json.dump(self._db, f, indent=4)
     
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         return self.password_hash.verify(plain_password, hashed_password)

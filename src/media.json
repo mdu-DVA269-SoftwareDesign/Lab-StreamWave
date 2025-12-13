@@ -1,0 +1,142 @@
+[
+    {
+        "id": 1,
+        "title": "Billie Jean",
+        "url": "/media/songs/billie-jean.mp3",
+        "length": 294,
+        "genre": "Pop",
+        "cover_image": "placeholder.jpg",
+        "media_type": "Song",
+        "artist": "Michael Jackson"
+    },
+    {
+        "id": 3,
+        "title": "Beat It",
+        "url": "/media/songs/beat-it.mp3",
+        "length": 258,
+        "genre": "Pop",
+        "cover_image": "placeholder.jpg",
+        "media_type": "Song",
+        "artist": "Michael Jackson"
+    },
+    {
+        "id": 4,
+        "title": "Like a Prayer",
+        "url": "/media/songs/like-a-prayer.mp3",
+        "length": 339,
+        "genre": "Pop",
+        "cover_image": "placeholder.jpg",
+        "media_type": "Song",
+        "artist": "Madonna"
+    },
+    {
+        "id": 6,
+        "title": "Vogue",
+        "url": "/media/songs/vogue.mp3",
+        "length": 295,
+        "genre": "Pop",
+        "cover_image": "placeholder.jpg",
+        "media_type": "Song",
+        "artist": "Madonna"
+    },
+    {
+        "id": 7,
+        "title": "Smells Like Teen Spirit",
+        "url": "/media/songs/smells-like-teen-spirit.mp3",
+        "length": 301,
+        "genre": "Rock",
+        "cover_image": "placeholder.jpg",
+        "media_type": "Song",
+        "artist": "Nirvana"
+    },
+    {
+        "id": 8,
+        "title": "Come As You Are",
+        "url": "/media/songs/come-as-you-are.mp3",
+        "length": 219,
+        "genre": "Rock",
+        "cover_image": "placeholder.jpg",
+        "media_type": "Song",
+        "artist": "Nirvana"
+    },
+    {
+        "id": 9,
+        "title": "Lithium",
+        "url": "/media/songs/lithium.mp3",
+        "length": 257,
+        "genre": "Rock",
+        "cover_image": "placeholder.jpg",
+        "media_type": "Song",
+        "artist": "Nirvana"
+    },
+    {
+        "id": 10,
+        "title": "Bohemian Rhapsody",
+        "url": "/media/songs/bohemian-rhapsody.mp3",
+        "length": 354,
+        "genre": "Rock",
+        "cover_image": "placeholder.jpg",
+        "media_type": "Song",
+        "artist": "Queen"
+    },
+    {
+        "id": 12,
+        "title": "We Will Rock You",
+        "url": "/media/songs/we-will-rock-you.mp3",
+        "length": 122,
+        "genre": "Rock",
+        "cover_image": "placeholder.jpg",
+        "media_type": "Song",
+        "artist": "Queen"
+    },
+    {
+        "id": 19,
+        "title": "Unraveling True Crime Cases",
+        "url": "/media/podcasts/crime-junkie-ep1.mp3",
+        "length": 2700,
+        "genre": "True Crime",
+        "cover_image": "placeholder.jpg",
+        "media_type": "Podcast",
+        "episode": 1
+    },
+    {
+        "id": 20,
+        "title": "Crime Junkie: The Missing Evidence",
+        "url": "/media/podcasts/crime-junkie-ep2.mp3",
+        "length": 2850,
+        "genre": "True Crime",
+        "cover_image": "placeholder.jpg",
+        "media_type": "Podcast",
+        "episode": 2
+    },
+    {
+        "id": 23,
+        "title": "Dateline NBC: The Cold Case Files",
+        "url": "/media/podcasts/dateline-ep1.mp3",
+        "length": 2600,
+        "genre": "True Crime",
+        "cover_image": "placeholder.jpg",
+        "media_type": "Podcast",
+        "episode": 1
+    },
+    {
+        "id": 24,
+        "title": "Dateline NBC: Mystery Solved",
+        "url": "/media/podcasts/dateline-ep2.mp3",
+        "length": 2750,
+        "genre": "True Crime",
+        "cover_image": "placeholder.jpg",
+        "media_type": "Podcast",
+        "episode": 2
+    },
+    {
+        "id": 0,
+        "title": "string",
+        "url": "string",
+        "length": 0,
+        "genre": "string",
+        "cover_image": "string",
+        "artist": "string",
+        "media_type": "Song"
+    }
+]
