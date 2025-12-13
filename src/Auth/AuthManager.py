@@ -1,12 +1,6 @@
 """
 OAuth2 Authentication Manager
 
-Handles all OAuth2 authentication concerns including:
-- Password hashing and verification
-- JWT token creation and validation
-- User authentication
-- OAuth2 dependencies for protected routes
-
 This code is based on the FastAPI Security Tutorial:
 https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/
 
@@ -30,8 +24,8 @@ from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
 from pydantic import BaseModel
 
-from RegisteredUser import RegisteredUser
-from User import User
+from .RegisteredUser import RegisteredUser
+from .User import User
 
 # to get a string like this run:
 # openssl rand -hex 32
