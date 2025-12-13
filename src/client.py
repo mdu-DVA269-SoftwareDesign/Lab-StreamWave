@@ -10,8 +10,8 @@ def main():
     media_manager = MediaManager(base_path / "media.json")
     playlist_manager = PlaylistManager(base_path / "playlists.json")
 
-    print("StreamWave Client")
-    print("=" * 40)
+    print("Welcome to StreamWave Client")
+    print("=" * 28)
 
     username = input("Username: ")
     password = input("Password: ")
