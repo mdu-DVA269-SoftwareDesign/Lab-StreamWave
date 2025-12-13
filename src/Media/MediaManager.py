@@ -10,18 +10,7 @@ from .Song import Song
 class MediaManager(JsonDataManager):
     def __init__(self, media_file: Optional[Path] = None):
         data_file = media_file or Path(__file__).parent / "media.json"
-        super().__init__(data_file, default_data=[])
-
-    def add_media_item(self, item: MediaContent) -> None:
-        item_dict = item.model_dump(by_alias=True, exclude_none=False)
-        self._db.append(item_dict)
-        self._save()
-
-    def get_media_by_id(self, media_id: int) -> Optional[MediaContent]:
-        for item_dict in self._db:
-            if item_dict.get("id") == media_id:
-                return self._dictionary_to_media(item_dict)
-        return None
+        super().__init__(data_file, default_data=[], id_field="id")
 
     def search_media(self, query: str) -> List[MediaContent]:
         q = query.lower()
@@ -33,14 +22,11 @@ class MediaManager(JsonDataManager):
                 results.append(self._dictionary_to_media(item_dict))
         return results
 
-    def get_all_media(self) -> List[MediaContent]:
-        return [self._dictionary_to_media(item_dict) for item_dict in self._db]
-
     def get_all_songs(self) -> List[Song]:
-        return [self._dictionary_to_media(item_dict) for item_dict in self._db if item_dict.get("media_type") == "Song"]
+        return [self._dictionary_to_media(item_dict) for item_dict in self.get_all() if item_dict.get("media_type") == "Song"]
 
     def get_all_podcasts(self) -> List[Podcast]:
-        return [self._dictionary_to_media(item_dict) for item_dict in self._db if item_dict.get("media_type") == "Podcast"]
+        return [self._dictionary_to_media(item_dict) for item_dict in self.get_all() if item_dict.get("media_type") == "Podcast"]
 
     @staticmethod
     def _dictionary_to_media(item_dict: dict) -> MediaContent:
