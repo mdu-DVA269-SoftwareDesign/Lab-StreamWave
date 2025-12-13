@@ -1,4 +1,4 @@
-from RegisteredUser import RegisteredUser
+from .RegisteredUser import RegisteredUser
 
 
 class Artist(RegisteredUser):
