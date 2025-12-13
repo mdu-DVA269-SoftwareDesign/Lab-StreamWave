@@ -1,8 +1,10 @@
-from typing import Annotated
+from typing import Annotated, Union
 
 from fastapi import Depends, FastAPI
 from fastapi.security import OAuth2PasswordRequestForm
-from Media.MediaManager import get_all_media, search_media
+from Media.MediaManager import get_all_media, search_media, add_media_item
+from Media.Song import Song
+from Media.Podcast import Podcast
 
 from AuthManager import (
     Token,
@@ -37,7 +39,6 @@ async def read_users_me(
 ):
     return current_user
 
-
 @app.get("/users/me/items/")
 async def read_own_items(
     current_user: Annotated[User, Depends(get_current_active_user)],
@@ -50,10 +51,14 @@ async def search_media_endpoint(query: str):
     results = search_media(query)
     return {"results": results}
 
+@app.post("/media/add_item/")
+async def add_media_item_endpoint(item: Union[Song, Podcast]):
+    add_media_item(item)
+    return {"message": "Media item added successfully", "media_type": item.media_type}
+
 @app.get("/")
 async def root():
     return {"message": "Welcome to StreamWave!"}
-
 
 if __name__ == "__main__":
     import uvicorn

@@ -18,19 +18,7 @@ def load_media_db():
 fake_media_db = load_media_db()
 
 def add_media_item(item: MediaContent):
-    item_dict = {
-        "id": item._ID,
-        "title": item._title,
-        "url": item._url,
-        "length": item._length,
-        "genre": item._genre,
-        "cover_image": item._cover_image,
-        "artist": item._artist,
-        "media_type": item.__class__.__name__,
-    }
-    
-    if isinstance(item, Podcast):
-        item_dict["episode"] = item._episode
+    item_dict = item.model_dump(by_alias=True, exclude_none=False)
     
     fake_media_db.append(item_dict)
     with open(Path(__file__).parent / "media.json", "w") as f:
@@ -62,19 +50,8 @@ def dictionary_to_media(item_dict: dict) -> MediaContent:
     media_type = item_dict.get("media_type")
     
     if media_type == "Song":
-        media = Song()
+        return Song(**item_dict)
     elif media_type == "Podcast":
-        media = Podcast()
-        media._episode = item_dict.get("episode")
+        return Podcast(**item_dict)
     else:
         raise ValueError(f"Unknown media type: {media_type}")
-    
-    media._ID = item_dict.get("id")
-    media._title = item_dict.get("title")
-    media._url = item_dict.get("url")
-    media._length = item_dict.get("length")
-    media._genre = item_dict.get("genre")
-    media._cover_image = item_dict.get("cover_image")
-    media._artist = item_dict.get("artist")
-    
-    return media
