@@ -1,13 +1,16 @@
 import json
 from abc import ABC
 from pathlib import Path
-from typing import Union
+from typing import Any, Optional, List, Union
+
 
 
 class JsonDataManager(ABC):
-    def __init__(self, data_file: Path, default_data: Union[list, dict] = None):
+    def __init__(self, data_file: Path, default_data: Union[list, dict] = None, id_field: str = "id"):
+        #super().__init__()
         self._data_file = data_file
         self._default_data = default_data if default_data is not None else []
+        self._id_field = id_field
         self._db = self._load()
     
     @property
@@ -28,3 +31,40 @@ class JsonDataManager(ABC):
     
     def reload(self) -> None:
         self._db = self._load()
+    
+    def add(self, item: Any) -> Any:
+        if hasattr(item, "model_dump"):
+            item_dict = item.model_dump()
+        elif isinstance(item, dict):
+            item_dict = item
+        else:
+            raise ValueError("Item must have a model_dump() method")
+        
+        self._db.append(item_dict)
+        self._save()
+        return item
+    
+    def get_by_id(self, item_id: Any) -> Optional[dict]:
+        for item in self._db:
+            if item.get(self._id_field) == item_id:
+                return item
+        return None
+    
+    def get_all(self) -> List[dict]:
+        return self._db.copy()
+    
+    def delete(self, item_id: Any) -> bool:
+        for i, item in enumerate(self._db):
+            if item.get(self._id_field) == item_id:
+                del self._db[i]
+                self._save()
+                return True
+        return False
+    
+    def update(self, item_id: Any, data: dict) -> Optional[dict]:
+        for i, item in enumerate(self._db):
+            if item.get(self._id_field) == item_id:
+                self._db[i].update(data)
+                self._save()
+                return self._db[i]
+        return None

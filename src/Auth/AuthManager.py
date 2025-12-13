@@ -54,7 +54,7 @@ class AuthManager(JsonDataManager):
         access_token_expire_minutes: int = DEFAULT_ACCESS_TOKEN_EXPIRE_MINUTES,
     ):
         data_file = users_file or Path(__file__).parent / "users.json"
-        super().__init__(data_file, default_data={})
+        super().__init__(data_file, default_data=[], id_field="id")
         
         self.secret_key = secret_key
         self.algorithm = algorithm
@@ -82,9 +82,9 @@ class AuthManager(JsonDataManager):
             return RegisteredUser(**user_dict)
     
     def get_user(self, username: str) -> Optional[User]:
-        if username in self._db:
-            user_dict = self._db[username]
-            return self._dictionary_to_user(user_dict)
+        for user_dict in self.get_all():
+            if user_dict.get("username") == username:
+                return self._dictionary_to_user(user_dict)
         return None
     
     def authenticate_user(self, username: str, password: str) -> User | bool:
@@ -166,3 +166,17 @@ class AuthManager(JsonDataManager):
                 )
             return current_user
         return get_artist_or_admin
+    
+    def get_admin_dependency(self):
+        get_current_active_user = self.get_current_active_user_dependency()
+        
+        async def get_admin(
+            current_user: Annotated[User, Depends(get_current_active_user)],
+        ):
+            if not isinstance(current_user, Admin):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Admin access required.",
+                )
+            return current_user
+        return get_admin

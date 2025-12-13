@@ -1,14 +1,19 @@
 from pathlib import Path
 from typing import Annotated, Union
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel
+
 from Media.MediaManager import MediaManager
 from Media.Song import Song
 from Media.Podcast import Podcast
 
 from Auth.AuthManager import AuthManager, Token
 from Auth.User import User
+from Auth.RegisteredUser import RegisteredUser
+from Auth.Artist import Artist
+from Auth.Admin import Admin
 
 app = FastAPI(title="StreamWave", description="Simple audio streaming application", version="0.0.1-prealpha")
 media_manager = MediaManager(Path(__file__).parent / "media.json")
@@ -17,6 +22,7 @@ auth_manager = AuthManager(Path(__file__).parent / "users.json")
 # Create the dependency functions from auth_manager instance
 get_current_active_user = auth_manager.get_current_active_user_dependency()
 get_artist_or_admin = auth_manager.get_artist_or_admin_dependency()
+get_admin = auth_manager.get_admin_dependency()
 
 """
 The following code is based on the FastAPI Security Tutorial:
@@ -46,7 +52,7 @@ async def read_users_me(
 async def read_own_items(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
-    media_items = media_manager.get_all_media()
+    media_items = media_manager.get_all()
     return {"user": current_user, "media_items": media_items}
 
 @app.get("/media/search/{query}")
@@ -59,8 +65,25 @@ async def add_media_item_endpoint(
     item: Union[Song, Podcast],
     current_user: Annotated[User, Depends(get_artist_or_admin)]
 ):
-    media_manager.add_media_item(item)
+    media_manager.add(item)
     return {"message": "Media item added successfully", "media_type": item.media_type, "added_by": current_user.username}
+
+
+@app.post("/admin/users/")
+async def create_user_endpoint(
+    user: Union[RegisteredUser, Artist, Admin],
+    password: str,
+    current_user: Annotated[User, Depends(get_admin)]
+):
+    if auth_manager.get_user(user.username):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Username '{user.username}' already exists"
+        )
+    user.hashed_password = auth_manager.get_password_hash(password)
+    
+    auth_manager.add(user)
+    return {"message": "User created successfully", "username": user.username, "user_type": user.user_type}
 
 @app.get("/")
 async def root():
