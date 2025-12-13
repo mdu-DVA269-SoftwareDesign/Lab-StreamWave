@@ -14,10 +14,12 @@ from Auth.User import User
 from Auth.RegisteredUser import RegisteredUser
 from Auth.Artist import Artist
 from Auth.Admin import Admin
+from Media.PlaylistManager import PlaylistManager
 
 app = FastAPI(title="StreamWave", description="Simple audio streaming application", version="0.0.1-prealpha")
 media_manager = MediaManager(Path(__file__).parent / "media.json")
 auth_manager = AuthManager(Path(__file__).parent / "users.json")
+playlist_manager = PlaylistManager(Path(__file__).parent / "playlists.json")
 
 # Create the dependency functions from auth_manager instance
 get_current_active_user = auth_manager.get_current_active_user_dependency()
@@ -54,6 +56,14 @@ async def read_own_items(
 ):
     media_items = media_manager.get_all()
     return {"user": current_user, "media_items": media_items}
+
+
+@app.get("/users/me/playlists/")
+async def read_own_playlists(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+):
+    playlists = playlist_manager.get_playlists_by_owner(current_user.ID)
+    return {"user": current_user, "playlists": playlists}
 
 @app.get("/media/search/{query}")
 async def search_media_endpoint(query: str):
