@@ -10,6 +10,7 @@ from Auth.AuthManager import (
     Token,
     authenticate_user_login,
     get_current_active_user,
+    get_artist_or_admin,
 )
 from Auth.User import User
 
@@ -52,9 +53,12 @@ async def search_media_endpoint(query: str):
     return {"results": results}
 
 @app.post("/media/add_item/")
-async def add_media_item_endpoint(item: Union[Song, Podcast]):
+async def add_media_item_endpoint(
+    item: Union[Song, Podcast],
+    current_user: Annotated[User, Depends(get_artist_or_admin)]
+):
     add_media_item(item)
-    return {"message": "Media item added successfully", "media_type": item.media_type}
+    return {"message": "Media item added successfully", "media_type": item.media_type, "added_by": current_user.username}
 
 @app.get("/")
 async def root():
