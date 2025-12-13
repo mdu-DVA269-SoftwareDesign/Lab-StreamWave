@@ -26,6 +26,8 @@ from pydantic import BaseModel
 
 from .RegisteredUser import RegisteredUser
 from .User import User
+from .Artist import Artist
+from .Admin import Admin
 
 # to get a string like this run:
 # openssl rand -hex 32
@@ -65,10 +67,23 @@ def get_password_hash(password):
     return password_hash.hash(password)
 
 
+def dictionary_to_user(user_dict: dict) -> User:
+    user_type = user_dict.get("user_type", "RegisteredUser")
+    
+    if user_type == "RegisteredUser":
+        return RegisteredUser(**user_dict)
+    elif user_type == "Artist":
+        return Artist(**user_dict)
+    elif user_type == "Admin":
+        return Admin(**user_dict)
+    else:
+        return RegisteredUser(**user_dict)
+
+
 def get_user(db, username: str):
     if username in db:
         user_dict = db[username]
-        return RegisteredUser(**user_dict)
+        return dictionary_to_user(user_dict)
 
 
 def authenticate_user(fake_db, username: str, password: str):
@@ -116,6 +131,17 @@ async def get_current_active_user(
 ):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+
+async def get_artist_or_admin(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+):
+    if not isinstance(current_user, (Artist, Admin)):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You dont have enough privileges.",
+        )
     return current_user
 
 

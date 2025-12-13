@@ -128,5 +128,15 @@
         "cover_image": "placeholder.jpg",
         "media_type": "Podcast",
         "episode": 2
+    },
+    {
+        "id": 0,
+        "title": "string",
+        "url": "string",
+        "length": 0,
+        "genre": "string",
+        "cover_image": "string",
+        "artist": "string",
+        "media_type": "Song"
     }
 ]
