@@ -1,7 +1,6 @@
 from .MediaContent import MediaContent
+from typing import Optional
 
 
 class Podcast(MediaContent):
-    def __init__(self):
-        super().__init__()
-        self._episode: int = None
+    episode: Optional[int] = None
