@@ -1,4 +1,4 @@
-from Playlist import Playlist
+from .Playlist import Playlist
 
 
 class Album(Playlist):

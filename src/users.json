@@ -1,12 +1,22 @@
-{
-  "martin": {
-    "ID": 1,
-    "username": "martin",
-    "full_name": "martin dahlgren",
-    "email": "mdahlgrengadd@gmail.com",
-    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$5dTh0SkDkkqhN53ilU1VpQ$LhBO0WUZlyHuyANkMuC97ePAGNtr6S+UrxPMvjk/49o",
-    "disabled": false,
-    "is_premium": true,
-    "user_type": "Artist"
-  }
-}
+[
+    {
+        "ID": 1,
+        "username": "martin",
+        "full_name": "martin dahlgren",
+        "email": "mdahlgrengadd@gmail.com",
+        "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$5dTh0SkDkkqhN53ilU1VpQ$LhBO0WUZlyHuyANkMuC97ePAGNtr6S+UrxPMvjk/49o",
+        "disabled": false,
+        "is_premium": true,
+        "user_type": "Admin"
+    },
+    {
+        "ID": 30,
+        "username": "nisse",
+        "full_name": "string",
+        "email": "string",
+        "disabled": false,
+        "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$li8Wxqdko0Q3uWZRf1XuQQ$aYY+ID1oVySC7XRgNVi6yRg+RXIgwTbGJBFcqwCB70A",
+        "is_premium": false,
+        "user_type": "RegisteredUser"
+    }
+]
