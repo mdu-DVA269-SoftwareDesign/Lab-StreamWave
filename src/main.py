@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Annotated, Union
 
 from fastapi import Depends, FastAPI
@@ -10,8 +11,8 @@ from Auth.AuthManager import AuthManager, Token
 from Auth.User import User
 
 app = FastAPI(title="StreamWave", description="Simple audio streaming application", version="0.0.1-prealpha")
-media_manager = MediaManager()
-auth_manager = AuthManager()
+media_manager = MediaManager(Path(__file__).parent / "media.json")
+auth_manager = AuthManager(Path(__file__).parent / "users.json")
 
 # Create the dependency functions from auth_manager instance
 get_current_active_user = auth_manager.get_current_active_user_dependency()
