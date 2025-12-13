@@ -6,12 +6,12 @@ from Media.MediaManager import get_all_media, search_media, add_media_item
 from Media.Song import Song
 from Media.Podcast import Podcast
 
-from AuthManager import (
+from Auth.AuthManager import (
     Token,
     authenticate_user_login,
     get_current_active_user,
 )
-from User import User
+from Auth.User import User
 
 app = FastAPI(title="StreamWave", description="Simple audio streaming application", version="0.0.1-prealpha")
 

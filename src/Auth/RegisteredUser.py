@@ -1,5 +1,5 @@
 from pydantic import Field
-from User import User
+from .User import User
 
 
 class RegisteredUser(User):
