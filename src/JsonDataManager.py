@@ -1,12 +1,12 @@
 import json
 from abc import ABC
 from pathlib import Path
-from typing import Any, Optional, List, Union
+from typing import Any, Optional, List
 
 
 
 class JsonDataManager(ABC):
-    def __init__(self, data_file: Path, default_data: Union[list, dict] = None, id_field: str = "id"):
+    def __init__(self, data_file: Path, default_data: list = None, id_field: str = "id"):
         #super().__init__()
         self._data_file = data_file
         self._default_data = default_data if default_data is not None else []
@@ -17,11 +17,11 @@ class JsonDataManager(ABC):
     def data_file(self) -> Path:
         return self._data_file
     
-    def _load(self) -> Union[list, dict]:
+    def _load(self) -> list:
         if not self._data_file.exists():
             with open(self._data_file, "w") as f:
                 json.dump(self._default_data, f)
-            return self._default_data.copy() if isinstance(self._default_data, (list, dict)) else self._default_data
+            return self._default_data.copy()
         with open(self._data_file, "r") as f:
             return json.load(f)
     
