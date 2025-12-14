@@ -2,19 +2,10 @@ from pathlib import Path
 from typing import Annotated, Union
 
 from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel
+from fastapi.security import OAuth2PasswordRequestForm 
 
-from Media.MediaManager import MediaManager
-from Media.Song import Song
-from Media.Podcast import Podcast
-
-from Auth.AuthManager import AuthManager, Token
-from Auth.User import User
-from Auth.RegisteredUser import RegisteredUser
-from Auth.Artist import Artist
-from Auth.Admin import Admin
-from Media.PlaylistManager import PlaylistManager
+from Media import MediaManager, Song, Podcast, PlaylistManager
+from Auth import AuthManager, Token, User, RegisteredUser, Artist, Admin
 
 app = FastAPI(title="StreamWave", description="Simple audio streaming application", version="0.0.1-prealpha")
 media_manager = MediaManager(Path(__file__).parent / "media.json")

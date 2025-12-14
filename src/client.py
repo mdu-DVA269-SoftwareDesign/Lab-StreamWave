@@ -1,8 +1,7 @@
 from pathlib import Path
 
-from Auth.AuthManager import AuthManager
-from Media.MediaManager import MediaManager
-from Media.PlaylistManager import PlaylistManager
+from Auth import AuthManager
+from Media import MediaManager, PlaylistManager
 
 def main():
     base_path = Path(__file__).parent
