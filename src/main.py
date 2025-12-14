@@ -14,9 +14,9 @@ playlist_manager = PlaylistManager(Path(__file__).parent / "playlists.json")
 
 # Create the dependency functions from auth_manager instance
 # to be used in route definitions below.
-get_current_active_user = auth_manager.get_current_active_user_dependency()
-get_artist_or_admin = auth_manager.get_artist_or_admin_dependency()
-get_admin = auth_manager.get_admin_dependency()
+get_current_active_user = auth_manager.get_dependency_for("active_user")
+get_artist_or_admin = auth_manager.get_dependency_for("artist_or_admin")
+get_admin = auth_manager.get_dependency_for("admin")
 
 """
 The following code is based on the FastAPI Security Tutorial:
