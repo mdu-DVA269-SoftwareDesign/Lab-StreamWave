@@ -29,6 +29,11 @@ from .User import User
 from .Artist import Artist
 from .Admin import Admin
 
+# to get a string like this run:
+# openssl rand -hex 32
+DEFAULT_SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+DEFAULT_ALGORITHM = "HS256"
+DEFAULT_ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 class Token(BaseModel):
     access_token: str
@@ -40,12 +45,6 @@ class TokenData(BaseModel):
 
 
 class AuthManager(JsonDataManager):
-    # to get a string like this run:
-    # openssl rand -hex 32
-    DEFAULT_SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-    DEFAULT_ALGORITHM = "HS256"
-    DEFAULT_ACCESS_TOKEN_EXPIRE_MINUTES = 30
-    
     def __init__(
         self,
         users_file: Optional[Path] = None,
@@ -120,8 +119,8 @@ class AuthManager(JsonDataManager):
         return Token(access_token=access_token, token_type="bearer")
     
     # We use closures here to capture self in the dependency functions,
-    # otherwise first argument self would be required in the FastAPI dependency call.
-    def get_current_user_dependency(self):
+    # otherwise first argument "self" would be required in the FastAPI dependency call.
+    def get_dependency_for(self, selected_dependency: str):
         async def get_current_user(token: Annotated[str, Depends(self.oauth2_scheme)]):
             credentials_exception = HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -140,10 +139,6 @@ class AuthManager(JsonDataManager):
             if user is None:
                 raise credentials_exception
             return user
-        return get_current_user
-    
-    def get_current_active_user_dependency(self):
-        get_current_user = self.get_current_user_dependency()
         
         async def get_current_active_user(
             current_user: Annotated[User, Depends(get_current_user)],
@@ -151,10 +146,6 @@ class AuthManager(JsonDataManager):
             if current_user.disabled:
                 raise HTTPException(status_code=400, detail="Inactive user")
             return current_user
-        return get_current_active_user
-    
-    def get_artist_or_admin_dependency(self):
-        get_current_active_user = self.get_current_active_user_dependency()
         
         async def get_artist_or_admin(
             current_user: Annotated[User, Depends(get_current_active_user)],
@@ -165,10 +156,6 @@ class AuthManager(JsonDataManager):
                     detail="You dont have enough privileges.",
                 )
             return current_user
-        return get_artist_or_admin
-    
-    def get_admin_dependency(self):
-        get_current_active_user = self.get_current_active_user_dependency()
         
         async def get_admin(
             current_user: Annotated[User, Depends(get_current_active_user)],
@@ -179,4 +166,18 @@ class AuthManager(JsonDataManager):
                     detail="Admin access required.",
                 )
             return current_user
-        return get_admin
+        
+        dependencies = {
+            "current_user": get_current_user,
+            "active_user": get_current_active_user,
+            "artist_or_admin": get_artist_or_admin,
+            "admin": get_admin,
+        }
+        
+        if selected_dependency not in dependencies:
+            raise ValueError(
+                f"Unknown dependency: '{selected_dependency}'. "
+                f"Available options: {list(dependencies.keys())}"
+            )
+        
+        return dependencies[selected_dependency]
