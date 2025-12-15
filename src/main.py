@@ -5,11 +5,11 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm 
 
 from Media import MediaManager, Song, Podcast, PlaylistManager
-from Auth import AuthManager, Token, User, RegisteredUser, Artist, Admin
+from Auth import FastAPIAuthManager, Token, User, RegisteredUser, Artist, Admin
 
 app = FastAPI(title="StreamWave", description="Simple audio streaming application", version="0.0.1-prealpha")
 media_manager = MediaManager(Path(__file__).parent / "media.json")
-auth_manager = AuthManager(Path(__file__).parent / "users.json")
+auth_manager = FastAPIAuthManager(Path(__file__).parent / "users.json")
 playlist_manager = PlaylistManager(Path(__file__).parent / "playlists.json")
 
 # Create the dependency functions from auth_manager instance
