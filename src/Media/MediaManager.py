@@ -10,7 +10,7 @@ from .Song import Song
 class MediaManager(JsonDataManager):
     def __init__(self, media_file: Optional[Path] = None):
         data_file = media_file or Path(__file__).parent / "media.json"
-        super().__init__(data_file, default_data=[], id_field="id")
+        super().__init__(data_file, default_data=[])
 
     def search_media(self, query: str) -> List[MediaContent]:
         q = query.lower()

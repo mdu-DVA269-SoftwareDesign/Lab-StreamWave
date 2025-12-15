@@ -37,7 +37,7 @@ class AuthManager(JsonDataManager):
         access_token_expire_minutes: int = DEFAULT_ACCESS_TOKEN_EXPIRE_MINUTES,
     ):
         data_file = users_file or Path(__file__).parent / "users.json"
-        super().__init__(data_file, default_data=[], id_field="id")
+        super().__init__(data_file, default_data=[])
 
         self.secret_key = secret_key
         self.algorithm = algorithm

@@ -1,6 +1,6 @@
 [
     {
-        "ID": 1,
+        "id": 1,
         "username": "martin",
         "full_name": "martin dahlgren",
         "email": "mdahlgrengadd@gmail.com",
@@ -10,7 +10,7 @@
         "user_type": "RegisteredUser"
     },
     {
-        "ID": 30,
+        "id": 30,
         "username": "nisse",
         "full_name": "string",
         "email": "string",

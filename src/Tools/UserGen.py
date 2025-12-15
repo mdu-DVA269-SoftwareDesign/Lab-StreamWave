@@ -14,7 +14,7 @@ hashed_password = password_hash.hash(password)
 
 user_entry = {
     username: {
-        "ID": user_id,
+        "id": user_id,
         "username": username,
         "full_name": full_name,
         "email": email,

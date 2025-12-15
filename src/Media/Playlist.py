@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 
 class Playlist(BaseModel):
-    ID: int = Field(..., description="The playlist ID")
+    id: int = Field(..., description="The playlist ID")
     name: str = Field(..., description="The name of the playlist")
     song_ids: List[int] = Field(
         default_factory=list, description="List of song IDs in the playlist")
