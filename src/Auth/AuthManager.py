@@ -18,6 +18,7 @@ DEFAULT_SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88
 DEFAULT_ALGORITHM = "HS256"
 DEFAULT_ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -42,17 +43,17 @@ class AuthManager(JsonDataManager):
         self.algorithm = algorithm
         self.access_token_expire_minutes = access_token_expire_minutes
         self.password_hash = PasswordHash.recommended()
-    
+
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         return self.password_hash.verify(plain_password, hashed_password)
-    
+
     def get_password_hash(self, password: str) -> str:
         return self.password_hash.hash(password)
-    
+
     @staticmethod
-    def _dictionary_to_user(user_dict: dict) -> User:
+    def _dictionary_to_user(user_dict: dict) -> RegisteredUser:
         user_type = user_dict.get("user_type", "RegisteredUser")
-        
+
         if user_type == "RegisteredUser":
             return RegisteredUser(**user_dict)
         elif user_type == "Artist":
@@ -61,21 +62,21 @@ class AuthManager(JsonDataManager):
             return Admin(**user_dict)
         else:
             return RegisteredUser(**user_dict)
-    
-    def get_user(self, username: str) -> Optional[User]:
+
+    def get_user(self, username: str) -> Optional[RegisteredUser]:
         for user_dict in self.get_all():
             if user_dict.get("username") == username:
                 return self._dictionary_to_user(user_dict)
         return None
-    
-    def authenticate_user(self, username: str, password: str) -> User | bool:
+
+    def authenticate_user(self, username: str, password: str) -> RegisteredUser | None:
         user = self.get_user(username)
         if not user:
-            return False
+            return None
         if not self.verify_password(password, user.hashed_password):
-            return False
+            return None
         return user
-    
+
     def create_access_token(self, data: dict, expires_delta: timedelta | None = None) -> str:
         to_encode = data.copy()
         if expires_delta:
@@ -83,5 +84,6 @@ class AuthManager(JsonDataManager):
         else:
             expire = datetime.now(timezone.utc) + timedelta(minutes=15)
         to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
+        encoded_jwt = jwt.encode(
+            to_encode, self.secret_key, algorithm=self.algorithm)
         return encoded_jwt

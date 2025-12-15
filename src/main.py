@@ -2,12 +2,13 @@ from pathlib import Path
 from typing import Annotated, Union
 
 from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm 
+from fastapi.security import OAuth2PasswordRequestForm
 
 from Media import MediaManager, Song, Podcast, PlaylistManager
 from Auth import FastAPIAuthManager, Token, User, RegisteredUser, Artist, Admin
 
-app = FastAPI(title="StreamWave", description="Simple audio streaming application", version="0.0.1-prealpha")
+app = FastAPI(title="StreamWave",
+              description="Simple audio streaming application", version="0.0.1-prealpha")
 media_manager = MediaManager(Path(__file__).parent / "media.json")
 auth_manager = FastAPIAuthManager(Path(__file__).parent / "users.json")
 playlist_manager = PlaylistManager(Path(__file__).parent / "playlists.json")
@@ -29,40 +30,38 @@ Copyright (c) 2018 Sebastián Ramírez
 FastAPI Documentation: https://fastapi.tiangolo.com/
 Repository: https://github.com/tiangolo/fastapi
 """
+
+
 @app.post("/token")
 async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-) -> Token:
+        form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
     return auth_manager.authenticate_user_login(form_data)
 
 
 @app.get("/users/me/", response_model=User)
 async def read_users_me(
-    current_user: Annotated[User, Depends(get_current_active_user)],
-):
+        current_user: Annotated[User, Depends(get_current_active_user)]):
     return current_user
+
 
 @app.get("/users/me/items/")
 async def read_own_items(
-    current_user: Annotated[User, Depends(get_current_active_user)],
-):
+        current_user: Annotated[User, Depends(get_current_active_user)]):
     media_items = media_manager.get_all()
     return {"user": current_user, "media_items": media_items}
 
 
 @app.get("/users/me/playlists/")
 async def read_own_playlists(
-    current_user: Annotated[User, Depends(get_current_active_user)],
-):
+        current_user: Annotated[User, Depends(get_current_active_user)]):
     playlists = playlist_manager.get_playlists_by_owner(current_user.ID)
     return {"user": current_user, "playlists": playlists}
 
 
 @app.get("/users/me/playlists/{playlist_id}")
 async def read_playlist_by_id(
-    playlist_id: int,
-    current_user: Annotated[User, Depends(get_current_active_user)],
-):
+        playlist_id: int,
+        current_user: Annotated[User, Depends(get_current_active_user)]):
     playlist = playlist_manager.get_by_id(playlist_id)
     if not playlist:
         raise HTTPException(status_code=404, detail="Playlist not found")
@@ -72,7 +71,11 @@ async def read_playlist_by_id(
 
 
 @app.get("/media/{media_id}")
-async def get_media_stream_url(media_id: int):
+async def get_media_stream_url(
+    media_id: int,
+    # TODO: Uncomment this if we want to force authentication
+    # current_user: Annotated[User, Depends(get_current_active_user)]
+) -> dict:
     media = media_manager.get_by_id(media_id)
     if not media:
         raise HTTPException(status_code=404, detail="Media not found")
@@ -83,6 +86,7 @@ async def get_media_stream_url(media_id: int):
 async def search_media_endpoint(query: str):
     results = media_manager.search_media(query)
     return {"results": results}
+
 
 @app.post("/media/add_item/")
 async def add_media_item_endpoint(
@@ -105,9 +109,10 @@ async def create_user_endpoint(
             detail=f"Username '{user.username}' already exists"
         )
     user.hashed_password = auth_manager.get_password_hash(password)
-    
+
     auth_manager.add(user)
     return {"message": "User created successfully", "username": user.username, "user_type": user.user_type}
+
 
 @app.get("/")
 async def root():
