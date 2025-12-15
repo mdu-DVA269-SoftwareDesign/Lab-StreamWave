@@ -10,11 +10,10 @@ class MediaContent(BaseModel):
     genre: Optional[str] = None
     cover_image: Optional[str] = None
     artist: Optional[str] = None
-    
+
     @computed_field
-    @property
     def media_type(self) -> str:
         return self.__class__.__name__
-    
+
     class Config:
         populate_by_name = True

@@ -12,8 +12,8 @@ class PlaylistManager(JsonDataManager):
 
     def get_playlists_by_owner(self, owner_id: int) -> List[Playlist]:
         return [
-            Playlist(**item_dict) 
-            for item_dict in self.get_all() 
+            Playlist(**item_dict)
+            for item_dict in self.get_all()
             if item_dict.get("owner_id") == owner_id
         ]
 

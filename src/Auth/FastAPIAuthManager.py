@@ -39,7 +39,8 @@ class FastAPIAuthManager(AuthManager):
                 detail="Incorrect username or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        access_token_expires = timedelta(minutes=self.access_token_expire_minutes)
+        access_token_expires = timedelta(
+            minutes=self.access_token_expire_minutes)
         access_token = self.create_access_token(
             data={"sub": user.username}, expires_delta=access_token_expires
         )
@@ -55,14 +56,15 @@ class FastAPIAuthManager(AuthManager):
                 headers={"WWW-Authenticate": "Bearer"},
             )
             try:
-                payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+                payload = jwt.decode(token, self.secret_key,
+                                     algorithms=[self.algorithm])
                 username = payload.get("sub")
                 if username is None:
                     raise credentials_exception
                 token_data = TokenData(username=username)
             except InvalidTokenError:
                 raise credentials_exception
-            user = self.get_user(username=token_data.username)
+            user = self.get_user(username=token_data.username or "")
             if user is None:
                 raise credentials_exception
             return user
