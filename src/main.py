@@ -54,7 +54,7 @@ async def read_own_items(
 @app.get("/users/me/playlists/")
 async def read_own_playlists(
         current_user: Annotated[User, Depends(get_current_active_user)]):
-    playlists = playlist_manager.get_playlists_by_owner(current_user.ID)
+    playlists = playlist_manager.get_playlists_by_owner(current_user.id)
     return {"user": current_user, "playlists": playlists}
 
 
@@ -65,7 +65,7 @@ async def read_playlist_by_id(
     playlist = playlist_manager.get_by_id(playlist_id)
     if not playlist:
         raise HTTPException(status_code=404, detail="Playlist not found")
-    if playlist.get("owner_id") != current_user.ID:
+    if playlist.get("owner_id") != current_user.id:
         raise HTTPException(status_code=403, detail="Not your playlist")
     return playlist
 

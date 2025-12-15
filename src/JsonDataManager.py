@@ -5,11 +5,9 @@ from typing import Any, Optional, List
 
 
 class JsonDataManager(ABC):
-    def __init__(self, data_file: Path, default_data: list[Any] = [], id_field: str = "id"):
-        # super().__init__()
+    def __init__(self, data_file: Path, default_data: list[Any] = None):
         self._data_file = data_file
         self._default_data = default_data if default_data is not None else []
-        self._id_field = id_field
         self._db = self._load()
 
     @property
@@ -18,14 +16,14 @@ class JsonDataManager(ABC):
 
     def _load(self) -> list:
         if not self._data_file.exists():
-            with open(self._data_file, "w") as f:
+            with open(self._data_file, "w", encoding="utf-8") as f:
                 json.dump(self._default_data, f)
             return self._default_data.copy()
-        with open(self._data_file, "r") as f:
+        with open(self._data_file, "r", encoding="utf-8") as f:
             return json.load(f)
 
     def _save(self) -> None:
-        with open(self._data_file, "w") as f:
+        with open(self._data_file, "w", encoding="utf-8") as f:
             json.dump(self._db, f, indent=4)
 
     def reload(self) -> None:
@@ -45,7 +43,7 @@ class JsonDataManager(ABC):
 
     def get_by_id(self, item_id: Any) -> Optional[dict]:
         for item in self._db:
-            if item.get(self._id_field) == item_id:
+            if item.get("id") == item_id:
                 return item
         return None
 
@@ -54,7 +52,7 @@ class JsonDataManager(ABC):
 
     def delete(self, item_id: Any) -> bool:
         for i, item in enumerate(self._db):
-            if item.get(self._id_field) == item_id:
+            if item.get("id") == item_id:
                 del self._db[i]
                 self._save()
                 return True
@@ -62,7 +60,7 @@ class JsonDataManager(ABC):
 
     def update(self, item_id: Any, data: dict) -> Optional[dict]:
         for i, item in enumerate(self._db):
-            if item.get(self._id_field) == item_id:
+            if item.get("id") == item_id:
                 self._db[i].update(data)
                 self._save()
                 return self._db[i]

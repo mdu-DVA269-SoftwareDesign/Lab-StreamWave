@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, computed_field
 
 
 class User(BaseModel):
-    ID: int = Field(..., description="The ID of the User")
+    id: int = Field(..., description="The ID of the User")
     username: str = Field(..., description="The username used during login")
     full_name: str | None = Field(
         default=None, description="The full display name")

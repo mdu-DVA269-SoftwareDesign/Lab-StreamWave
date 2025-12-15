@@ -8,7 +8,7 @@ from .Playlist import Playlist
 class PlaylistManager(JsonDataManager):
     def __init__(self, playlist_file: Optional[Path] = None):
         data_file = playlist_file or Path(__file__).parent / "playlists.json"
-        super().__init__(data_file, default_data=[], id_field="ID")
+        super().__init__(data_file, default_data=[])
 
     def get_playlists_by_owner(self, owner_id: int) -> List[Playlist]:
         return [

@@ -25,9 +25,9 @@ def main():
     print()
 
     print("Your playlists:")
-    playlists = playlist_manager.get_playlists_by_owner(user.ID)
+    playlists = playlist_manager.get_playlists_by_owner(user.id)
     for pl in playlists:
-        print(f"  [{pl.ID}] {pl.name} ({len(pl.song_ids)} items)")
+        print(f"  [{pl.id}] {pl.name} ({len(pl.song_ids)} items)")
     print()
 
     query = input("Search for music: ")
