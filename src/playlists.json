@@ -1,0 +1,35 @@
+[
+    {
+        "id": 1,
+        "name": "Martins Rocky Favorites",
+        "song_ids": [
+            8,
+            9,
+            10,
+            12
+        ],
+        "owner_id": 1
+    },
+    {
+        "id": 2,
+        "name": "80s Pop Classics",
+        "song_ids": [
+            1,
+            3,
+            4,
+            6
+        ],
+        "owner_id": 1
+    },
+    {
+        "id": 3,
+        "name": "True Crime Podcasts",
+        "song_ids": [
+            19,
+            20,
+            23,
+            24
+        ],
+        "owner_id": 1
+    }
+]
