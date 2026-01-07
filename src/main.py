@@ -1,9 +1,10 @@
 from pathlib import Path
-from typing import Annotated, Union
+from typing import Annotated, Union, Optional
 import random
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel
 
 from Media import MediaManager, Song, Podcast, PlaylistManager, Playlist
 from Auth import FastAPIAuthManager, Token, User, RegisteredUser, Artist, Admin
@@ -31,6 +32,39 @@ Copyright (c) 2018 Sebastián Ramírez
 FastAPI Documentation: https://fastapi.tiangolo.com/
 Repository: https://github.com/tiangolo/fastapi
 """
+
+
+class RegisterRequest(BaseModel):
+    username: str
+    password: str
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+
+
+@app.post("/register")
+async def register_user(request: RegisterRequest):
+    if auth_manager.get_user(request.username):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Username '{request.username}' already exists"
+        )
+
+    all_users = auth_manager.get_all()
+    max_id = max((u.get("id", 0) for u in all_users), default=0)
+
+    hashed_password = auth_manager.get_password_hash(request.password)
+    user = RegisteredUser(
+        id=max_id + 1,
+        username=request.username,
+        full_name=request.full_name,
+        email=request.email,
+        hashed_password=hashed_password,
+        disabled=False,
+        is_premium=False
+    )
+
+    auth_manager.add(user)
+    return {"message": "User created successfully", "username": user.username}
 
 
 @app.post("/token")
@@ -79,14 +113,14 @@ async def get_media_stream_url(
     media = media_manager.get_by_id(media_id)
     if not media:
         raise HTTPException(status_code=404, detail="Media not found")
-    
+
     user_playlists = playlist_manager.get_playlists_by_owner(current_user.id)
     history_playlist = None
     for pl in user_playlists:
         if pl.name == "listening_history_playlist":
             history_playlist = pl
             break
-    
+
     if not history_playlist:
         all_playlists = playlist_manager.get_all()
         max_id = max((p.get("id", 0) for p in all_playlists), default=0)
@@ -97,10 +131,11 @@ async def get_media_stream_url(
             owner_id=current_user.id
         )
         playlist_manager.add(history_playlist)
-    
+
     history_playlist.add_song(media_id)
-    playlist_manager.update(history_playlist.id, {"song_ids": history_playlist.song_ids})
-    
+    playlist_manager.update(history_playlist.id, {
+                            "song_ids": history_playlist.song_ids})
+
     return {"id": media_id, "title": media.get("title"), "url": media.get("url")}
 
 
@@ -120,33 +155,33 @@ async def get_recommendations(
         if pl.name == "listening_history_playlist":
             history_playlist = pl
             break
-    
+
     if not history_playlist or not history_playlist.song_ids:
         all_media = media_manager.get_all()
         if all_media:
             return random.choice(all_media)
         return {}
-    
-    genre_counts = {}
+
+    genre_counts: dict[str, int] = {}
     for song_id in history_playlist.song_ids:
         media = media_manager.get_by_id(song_id)
         if media:
             genre = media.get("genre", "Unknown")
             genre_counts[genre] = genre_counts.get(genre, 0) + 1
-    
+
     if not genre_counts:
         all_media = media_manager.get_all()
         if all_media:
             return random.choice(all_media)
         return {}
-    
+
     max_genre = max(genre_counts.items(), key=lambda x: x[1])[0]
     all_media = media_manager.get_all()
     filtered_media = [m for m in all_media if m.get("genre") == max_genre]
-    
+
     if filtered_media:
         return random.choice(filtered_media)
-    
+
     return {}
 
 
