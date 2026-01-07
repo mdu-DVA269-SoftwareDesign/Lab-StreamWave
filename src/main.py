@@ -1,10 +1,11 @@
 from pathlib import Path
 from typing import Annotated, Union
+import random
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from Media import MediaManager, Song, Podcast, PlaylistManager
+from Media import MediaManager, Song, Podcast, PlaylistManager, Playlist
 from Auth import FastAPIAuthManager, Token, User, RegisteredUser, Artist, Admin
 
 app = FastAPI(title="StreamWave",
@@ -73,12 +74,33 @@ async def read_playlist_by_id(
 @app.get("/media/{media_id}")
 async def get_media_stream_url(
     media_id: int,
-    # TODO: Uncomment this if we want to force authentication
-    # current_user: Annotated[User, Depends(get_current_active_user)]
+    current_user: Annotated[User, Depends(get_current_active_user)]
 ) -> dict:
     media = media_manager.get_by_id(media_id)
     if not media:
         raise HTTPException(status_code=404, detail="Media not found")
+    
+    user_playlists = playlist_manager.get_playlists_by_owner(current_user.id)
+    history_playlist = None
+    for pl in user_playlists:
+        if pl.name == "listening_history_playlist":
+            history_playlist = pl
+            break
+    
+    if not history_playlist:
+        all_playlists = playlist_manager.get_all()
+        max_id = max((p.get("id", 0) for p in all_playlists), default=0)
+        history_playlist = Playlist(
+            id=max_id + 1,
+            name="listening_history_playlist",
+            song_ids=[],
+            owner_id=current_user.id
+        )
+        playlist_manager.add(history_playlist)
+    
+    history_playlist.add_song(media_id)
+    playlist_manager.update(history_playlist.id, {"song_ids": history_playlist.song_ids})
+    
     return {"id": media_id, "title": media.get("title"), "url": media.get("url")}
 
 
@@ -86,6 +108,46 @@ async def get_media_stream_url(
 async def search_media_endpoint(query: str):
     results = media_manager.search_media(query)
     return {"results": results}
+
+
+@app.get("/recommendations")
+async def get_recommendations(
+    current_user: Annotated[User, Depends(get_current_active_user)]
+) -> dict:
+    user_playlists = playlist_manager.get_playlists_by_owner(current_user.id)
+    history_playlist = None
+    for pl in user_playlists:
+        if pl.name == "listening_history_playlist":
+            history_playlist = pl
+            break
+    
+    if not history_playlist or not history_playlist.song_ids:
+        all_media = media_manager.get_all()
+        if all_media:
+            return random.choice(all_media)
+        return {}
+    
+    genre_counts = {}
+    for song_id in history_playlist.song_ids:
+        media = media_manager.get_by_id(song_id)
+        if media:
+            genre = media.get("genre", "Unknown")
+            genre_counts[genre] = genre_counts.get(genre, 0) + 1
+    
+    if not genre_counts:
+        all_media = media_manager.get_all()
+        if all_media:
+            return random.choice(all_media)
+        return {}
+    
+    max_genre = max(genre_counts.items(), key=lambda x: x[1])[0]
+    all_media = media_manager.get_all()
+    filtered_media = [m for m in all_media if m.get("genre") == max_genre]
+    
+    if filtered_media:
+        return random.choice(filtered_media)
+    
+    return {}
 
 
 @app.post("/media/add_item/")
